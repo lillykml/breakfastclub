@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 app.use(express.json())
@@ -5,45 +6,21 @@ const cors = require('cors')
 app.use(cors())
 const { generateId } = require('./utils/helpers');
 app.use(express.static('dist'))
+const Brunch = require('./models/brunch')
 
-
-let brunches = [
-    {
-      "id": 1,
-      "date": "21.07.2024",
-      "time": "10:30",
-      "location": "Emmis Kitchen",
-      "attendees": 4,
-      "spots": 8
-    },
-    {
-      "id": 2,
-      "date": "21.07.2024",
-      "time": "10:30",
-      "location": "Trachtenvogel",
-      "attendees": 4,
-      "spots": 8
-    },
-    {
-      "id": 3,
-      "date": "21.07.2024",
-      "time": "10:30",
-      "location": "Wimmer Bäcker",
-      "attendees": 4,
-      "spots": 8
-    }
-]
 
 app.get('/', (request, response) => {
     response.json({message: 'Use the endpoint /api/brunches'})
   })
 
-app.get('/api/brunches', (request, response) => {
+app.get('/api/brunches', async (request, response) => {
+    const brunches = await Brunch.find({})
     response.json(brunches)
 })
 
-app.get('/api/brunches/:id', (request, response) => {
-    const brunch = brunches.find(brunch => brunch.id === request.params.id)
+app.get('/api/brunches/:id', async (request, response) => {
+
+    const brunch = await Brunch.findById(request.params.id)
     if (brunch) {
         response.json(brunch)
     } else {
@@ -51,34 +28,25 @@ app.get('/api/brunches/:id', (request, response) => {
     }
 })
 
-app.delete('/api/brunches/:id', (request, response) => {
-    const id = Number(request.params.id)
-    brunches = brunches.filter(brunch => brunch.id !== id)
+app.delete('/api/brunches/:id', async (request, response) => {
+    await Brunch.findByIdAndDelete(request.params.id)
     response.status(204).end()
 })
 
 
-app.post('/api/brunches', (request, response) => {
-const body = request.body
+app.post('/api/brunches', async (request, response) => {
 
-if (!body.date || !body.time || !body.location || !body.spots) {
-    return response.status(400).json({ 
-    error: 'content missing' 
+    const body = request.body
+
+    const brunch = new Brunch({
+    datetime: body.datetime,
+    locationName: body.location,
+    address: body.address,
+    spots: body.spots
     })
-}
 
-const brunch = {
-    date: body.date,
-    time: body.time,
-    location: body.location,
-    spots: body.spots,
-    attendees: body.attendees,
-    id: generateId(brunches),
-}
-
-brunches = brunches.concat(brunch)
-
-response.json(brunch)
+    const newBrunch = await brunch.save()
+    response.status(201).json(newBrunch)
 })
 
 const unknownEndpoint = (request, response) => {
