@@ -1,6 +1,6 @@
-const generateId = () => {
-    const maxId = notes.length > 0
-      ? Math.max(...notes.map(n => n.id))
+const generateId = (brunches) => {
+    const maxId = brunches.length > 0
+      ? Math.max(...brunches.map(n => n.id))
       : 0
     return maxId + 1
 }

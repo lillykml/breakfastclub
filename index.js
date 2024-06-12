@@ -1,8 +1,12 @@
 const express = require('express')
 const app = express()
-const { generateId } = require('./utils');
+app.use(express.json())
+const cors = require('cors')
+app.use(cors())
+const { generateId } = require('./utils/helpers');
 
-const brunches = [
+
+let brunches = [
     {
       "id": 1,
       "date": "21.07.2024",
@@ -68,13 +72,19 @@ const brunch = {
     location: body.location,
     spots: body.spots,
     attendees: body.attendees,
-    id: generateId(),
+    id: generateId(brunches),
 }
 
 brunches = brunches.concat(brunch)
 
 response.json(brunch)
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+app.use(unknownEndpoint)
 
 
 const PORT = 3001
