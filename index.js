@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const { generateId } = require('./utils');
 
 const brunches = [
     {
@@ -45,6 +46,35 @@ app.get('/api/brunches/:id', (request, response) => {
     }
 })
 
+app.delete('/api/brunches/:id', (request, response) => {
+    const id = Number(request.params.id)
+    brunches = brunches.filter(brunch => brunch.id !== id)
+    response.status(204).end()
+})
+
+
+app.post('/api/brunches', (request, response) => {
+const body = request.body
+
+if (!body.date || !body.time || !body.location || !body.spots) {
+    return response.status(400).json({ 
+    error: 'content missing' 
+    })
+}
+
+const brunch = {
+    date: body.date,
+    time: body.time,
+    location: body.location,
+    spots: body.spots,
+    attendees: body.attendees,
+    id: generateId(),
+}
+
+brunches = brunches.concat(brunch)
+
+response.json(brunch)
+})
 
 
 const PORT = 3001
