@@ -37,7 +37,14 @@ const brunchSchema = new mongoose.Schema({
     full: {
         type: Boolean,
         default: false
-  }})
+    },
+    organizer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+      }
+})
+
 
   brunchSchema.set('toJSON', {
     transform: (document, returnedObject) => {

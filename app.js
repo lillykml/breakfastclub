@@ -4,6 +4,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 require('express-async-errors')
 const brunchRouter = require('./controllers/brunches')
+const usersRouter = require('./controllers/users')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
@@ -26,6 +27,7 @@ mongoose.connect(url)
 
 app.use(express.static('dist'))
 app.use('/api/brunches', brunchRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
