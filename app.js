@@ -27,6 +27,7 @@ mongoose.connect(url)
   })
 
 app.use(express.static('dist'))
+app.use(middleware.tokenExtractor)
 app.use('/api/brunches', brunchRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)

@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const brunchRouter = require('express').Router()
 const Brunch = require('../models/brunch')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 
 brunchRouter.get('/', async (request, response) => {
@@ -55,15 +56,19 @@ brunchRouter.delete('/:id', async (request, response) => {
 brunchRouter.post('/', async (request, response) => {
 
     const body = request.body
-    const organizer = await User.findById(body.organizerId)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'token invalid' })
+      }
+    const organizer = await User.findById(decodedToken.id)
 
     const brunch = new Brunch({
     datetime: body.datetime,
     locationName: body.location,
     address: body.address,
     spots: body.spots,
-    organizer: organizer.id,
-    attendees: [organizer.id],
+    organizer: organizer._id,
+    attendees: [organizer._id],
     })
 
     const newBrunch = await brunch.save()
