@@ -22,6 +22,7 @@ const brunchSchema = new mongoose.Schema({
     },
     spots: {
         type: Number,
+        required: true,
         validate: {
             validator: function(v) {
                 return v < 9
