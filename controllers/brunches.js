@@ -7,12 +7,16 @@ const User = require('../models/user')
 brunchRouter.get('/', async (request, response) => {
     const brunches = await Brunch.find({})
     .populate('organizer', {username: 1})
+    .populate('attendees', {username: 1})
     response.json(brunches)
 })
 
 brunchRouter.get('/:id', async (request, response) => {
 
-    const brunch = await Brunch.findById(request.params.id)
+    const brunch = await Brunch
+    .findById(request.params.id)
+    .populate('organizer', {username: 1})
+    .populate('attendees', {username: 1})
     if (brunch) {
         response.json(brunch)
     } else {
@@ -24,15 +28,22 @@ brunchRouter.delete('/:id', async (request, response) => {
 
     const session = await mongoose.startSession()
     session.startTransaction()
+
     const brunchId = request.params.id
     const brunch = await Brunch.findById(brunchId).session(session)
     const organizerId = brunch.organizer
+    const attendees = brunch.attendees
 
     await Brunch.findByIdAndDelete(brunchId).session(session)
 
     await User.findByIdAndUpdate(organizerId, { 
-        $pull: { organizedBrunches: brunchId, brunches: brunchId}
+        $pull: { organizedBrunches: brunchId }
       }).session(session)
+
+    await User.updateMany(
+        { _id: { $in: attendees } },
+        { $pull: { brunches: brunchId } }
+    ).session(session)
 
     await session.commitTransaction();
     session.endSession();
