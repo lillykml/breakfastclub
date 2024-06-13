@@ -30,10 +30,12 @@ const brunchSchema = new mongoose.Schema({
             message: props => 'We want our brunches to be intimate so the maximum number of people is 8.'
         }
     },
-    attendees: {
-        type: Number,
-        default: 1
-    },
+    attendees: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User'
+        }
+    ],
     full: {
         type: Boolean,
         default: false

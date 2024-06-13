@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema({
       ref: 'Brunch'
     }
   ],
+  organizedBrunches: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Brunch'
+    }
+  ],
 })
 
 userSchema.set('toJSON', {
