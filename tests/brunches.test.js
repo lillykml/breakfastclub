@@ -1,51 +1,42 @@
-// const { test, after, beforeEach, describe } = require('node:test')
-// const assert = require('node:assert')
-// const mongoose = require('mongoose')
-// const supertest = require('supertest')
-// const app = require('../app')
-// const Brunch = require('../models/brunch')
-// const User = require('../models/user')
+const { test, after, beforeEach, describe } = require('node:test')
+const assert = require('node:assert')
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const Brunch = require('../models/brunch')
+const User = require('../models/user')
+const helpers = require('./testhelpers')
 
-// const api = supertest(app)
+const api = supertest(app)
 
-// const initialBrunches = [
-//     {
-//         "datetime": "2024-07-14T08:30:00.000Z",
-//         "locationName": "Another super new Brunch Spot",
-//         "address": "Neureutherstrasse 1",
-//         "spots": 6,
-//     }, 
-//     {
-//         "datetime": "2024-07-23T08:30:00.000Z",
-//         "locationName": "Cafe Conté",
-//         "address": "Ainmillerstraße 1",
-//         "spots": 8,
-//     }
-// ]
+describe('Retrieving brunches correctly', async () => {
 
-// beforeEach(async() => {
-//     await Brunch.deleteMany({})
-//     const brunchObjects = initialBrunches.map(brunch => new Brunch(brunch))
-//     const promiseArray = brunchObjects.map(brunch => brunch.save())
-//     await Promise.all(promiseArray)
-// })
+    beforeEach(async() => {
+        await User.deleteMany({})
+        const userObject = new User(await helpers.getInitialUser()) 
+        const user = await userObject.save()
+        const brunches = await helpers.getInitialBrunches(user._id)
+    
+        await Brunch.deleteMany({})
+        const brunchObjects = brunches.map(brunch => new Brunch(brunch))
+        const promiseArray = brunchObjects.map(brunch => brunch.save())
+        await Promise.all(promiseArray)
+    })
 
-// describe('Retrieving brunches correctly', () => {
+    test('brunches are returned as json', async () => {
+        await api
+          .get('/api/brunches')
+          .expect(200)
+          .expect('Content-Type', /application\/json/) // using Regex
+      })
 
-//     test('brunches are returned as json', async () => {
-//         await api
-//           .get('/api/brunches')
-//           .expect(200)
-//           .expect('Content-Type', /application\/json/) // using Regex
-//       })
-
-//       test('Correct number of brunches is returned', async () => {
-//         const response = await api.get('/api/brunches')
-//         assert.strictEqual(response.data.length === initialBrunches.length)
-//       })
-// })
+    test.only('Correct number of brunches is returned', async () => {
+        const response = await api.get('/api/brunches')
+        assert.strictEqual(response.body.length, helpers.initialBrunches.length)
+      })
+})
 
 
-//   after(async () => {
-//     await mongoose.connection.close()
-//   })
+  after(async () => {
+    await mongoose.connection.close()
+  })
