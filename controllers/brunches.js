@@ -102,7 +102,7 @@ brunchRouter.put('/:id/signup', async (request, response) => {
     }
 
     brunch.attendees.push(userId);
-    await brunch.save({ session });
+    let savedBrunch = await brunch.save({ session });
 
     const user = await User.findById(userId).session(session);
     user.brunches.push(brunchId);
@@ -110,7 +110,7 @@ brunchRouter.put('/:id/signup', async (request, response) => {
 
     await session.commitTransaction();
     session.endSession();
-    response.status(200).json(brunch);
+    response.status(200).json(savedBrunch);
 })
 
 module.exports = brunchRouter
