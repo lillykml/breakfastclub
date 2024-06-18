@@ -5,16 +5,16 @@ const jwt = require('jsonwebtoken')
 
 let initialBrunches = [
     {
-        "datetime": "2024-07-14T08:30:00.000Z",
-        "locationName": "Another super new Brunch Spot",
-        "address": "Neureutherstrasse 1",
-        "spots": 6,
+        datetime: "2024-07-14T08:30:00.000Z",
+        locationName: "Another super new Brunch Spot",
+        address: "Neureutherstrasse 1",
+        spots: 6
     }, 
     {
-        "datetime": "2024-07-23T08:30:00.000Z",
-        "locationName": "Cafe Conté",
-        "address": "Ainmillerstraße 1",
-        "spots": 8,
+        datetime: "2024-07-23T08:30:00.000Z",
+        locationName: "Cafe Conté",
+        address: "Ainmillerstraße 1",
+        spots: 8
     }
 ]
 

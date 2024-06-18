@@ -12,7 +12,8 @@ const brunchSchema = new mongoose.Schema({
                     return date > new Date();
                 },
                 message: props => `${props.value} is not in the future.`
-            },
+            }
+    },
     locationName: {
         type: String,
         required: true,
@@ -47,7 +48,7 @@ const brunchSchema = new mongoose.Schema({
         ref: 'User',
         required: true
       }
-}})
+})
 
 
   brunchSchema.set('toJSON', {
