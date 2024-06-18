@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/user');
 const brunch = require('../models/brunch');
+const jwt = require('jsonwebtoken')
 
 let initialBrunches = [
     {
@@ -31,7 +32,7 @@ const getInitialUser = async () => {
     const passwordHash = await bcrypt.hash('sekretsekret', 10)
     
     return {
-    "name": "Test User",
+    "name": "Lizzy User",
     "username": "testoo",
     "passwordHash": passwordHash,
     }
@@ -47,4 +48,8 @@ const usersInDb = async () => {
     return users.map(user => user.toJSON())
 }
 
-module.exports = { getInitialUser, usersInDb, getInitialBrunches, initialBrunches}
+const getUserToken = async (user) => {
+    return jwt.sign(user, process.env.SECRET)
+}
+
+module.exports = { getInitialUser, usersInDb, getInitialBrunches, initialBrunches, brunchesInDb, getUserToken}

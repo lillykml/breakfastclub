@@ -16,10 +16,10 @@ app.use(cors())
 
 // DB Connection
 mongoose.set('strictQuery',false)
-const url = process.env.MONGODB_URI
-logger.info('connecting to', url)
-mongoose.connect(url)
-  .then(result => {
+logger.info('connecting to', config.MONGODB_URI)
+
+mongoose.connect(config.MONGODB_URI)
+  .then(() => {
     logger.info('connected to MongoDB')
   })
   .catch(error => {

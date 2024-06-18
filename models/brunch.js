@@ -4,13 +4,15 @@ const brunchSchema = new mongoose.Schema({
     datetime: {
         type: Date,
         required: true,
-        validate: {
-            validator: function(v) {
-                return v > new Date()
+        validate:
+            {
+                validator: function(v) {
+                    // Check if the datetime is in the future
+                    const date = new Date(v);
+                    return date > new Date();
+                },
+                message: props => `${props.value} is not in the future.`
             },
-            message: props => 'The brunch date must be in the future'
-        }
-    },
     locationName: {
         type: String,
         required: true,
@@ -45,7 +47,7 @@ const brunchSchema = new mongoose.Schema({
         ref: 'User',
         required: true
       }
-})
+}})
 
 
   brunchSchema.set('toJSON', {

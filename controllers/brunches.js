@@ -67,8 +67,8 @@ brunchRouter.post('/', async (request, response) => {
     locationName: body.location,
     address: body.address,
     spots: body.spots,
-    organizer: organizer._id,
-    attendees: [organizer._id],
+    organizer: organizer.id,
+    attendees: [organizer.id],
     })
 
     const newBrunch = await brunch.save()

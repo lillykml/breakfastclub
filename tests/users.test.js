@@ -9,18 +9,14 @@ const helpers = require('./testhelpers')
 
 const api = supertest(app)
 
-describe('Creating a new user', () => {
+beforeEach(async () => {
+  await User.deleteMany({})
+  const userData = await helpers.getInitialUser()
+  const user = new User(userData)
+  await user.save()
+})
 
-    beforeEach(async () => {
-        await User.deleteMany({})
-        const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({
-            "name": "Test User",
-            "username": "testoo",
-            "passwordHash": passwordHash
-            })
-        await user.save()
-    })
+describe('Creating a new user', () => {
 
     test('creation succeeds with a fresh username', async () => {
         const usersAtStart = await helpers.usersInDb()
@@ -134,17 +130,6 @@ describe('Creating a new user', () => {
 })
 
 describe('Retrieving users', () => {
-
-  beforeEach(async () => {
-    await User.deleteMany({})
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({
-        "name": "Test User",
-        "username": "testoo",
-        "passwordHash": passwordHash
-        })
-    await user.save()
-  })
 
   test('User information is returned as json', async () => {
     await api
