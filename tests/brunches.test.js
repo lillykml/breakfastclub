@@ -164,6 +164,46 @@ describe('Adding a new brunch', async () => {
     })
 })
 
+describe('Deleting a brunch', async () => {
+    test.only('Deleting a brunch removes the brunch', async () => {
+        const brunchesAtStart = await helpers.brunchesInDb()
+        const idToDelete = brunchesAtStart[0].id
+        
+        await api.delete(`/api/brunches/${idToDelete}`)
+        const brunchesAtEnd = await helpers.brunchesInDb()
+        assert.strictEqual(brunchesAtStart.length-1, brunchesAtEnd.length)
+
+        const organizerID = brunchesAtStart[0].organizer
+        const organizer = await User.findOne({_id: organizerID})
+        console.log(organizer)
+    })
+
+    test.only('Deleting a brunch removes the brunch from the organizer', async () => {
+
+        const newBrunch = {
+            "datetime": "2024-07-14T08:30:00.000Z",
+            "location": "Another super new Brunch Spot",
+            "address": "Neureutherstrasse 1",
+            "spots": 6
+        }
+
+        const createdBrunch = await api
+        .post('/api/brunches')
+        .set('Authorization', `Bearer ${global.testToken}`)
+        .send(newBrunch)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+        const idToDelete = createdBrunch.body.id
+        
+        await api.delete(`/api/brunches/${idToDelete}`)
+
+        const organizerID = createdBrunch.body.organizer
+        const organizer = await User.findOne({_id: organizerID})
+        assert(!organizer.organizedBrunches.includes(idToDelete))
+        assert(!organizer.brunches.includes(idToDelete))
+    })
+})
 
   after(async () => {
     await mongoose.connection.close()
