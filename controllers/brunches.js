@@ -113,4 +113,39 @@ brunchRouter.put('/:id/signup', async (request, response) => {
     response.status(200).json(savedBrunch);
 })
 
+brunchRouter.put('/:id/deregister', async (request, response) => {
+    const brunchId = request.params.id
+
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'token invalid' });
+    }
+    const userId = decodedToken.id;
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    const brunch = await Brunch.findById(brunchId).session(session);
+    if (!brunch) {
+        await session.abortTransaction();
+        session.endSession();
+        return response.status(404).json({ error: 'Brunch not found' });
+    }
+    if (!brunch.attendees.includes(userId)) {
+        await session.abortTransaction();
+        session.endSession();
+        return response.status(400).json({ error: 'User already is not registered for the brunch' });
+    }
+
+    const savedBrunch = await Brunch.findByIdAndUpdate(brunchId, { 
+        $pull: { attendees: userId }}, { new: true }).session(session)
+
+    await User.findByIdAndUpdate(userId, { 
+        $pull: { brunches: brunchId }
+      }).session(session)
+
+    await session.commitTransaction();
+    session.endSession();
+    response.status(200).json(savedBrunch);
+})
+
 module.exports = brunchRouter
